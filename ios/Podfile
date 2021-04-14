@@ -12,6 +12,8 @@ target 'idle_timer' do
     :hermes_enabled => false
   )
 
+  pod 'RNSVG', :path => '../node_modules/react-native-svg'
+
   target 'idle_timerTests' do
     inherit! :complete
     # Pods for testing

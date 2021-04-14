@@ -6,106 +6,113 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import type {Node} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import {ScrollView, StyleSheet, View} from 'react-native';
+import moment from 'moment';
+import LapSelection from './src/common/LapSelection/component';
+import CustomButton from './src/common/CustomButton/component';
+import CircularProgress from './src/common/CircularProgress/component';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const App: () => Node = () => {
+  const [timerLapState, setTimerLapState] = useState([]);
+  const [timerStartState, setTimerStartState] = useState(false);
+  const [currentTimerState, setCurrentTimerState] = useState(0);
 
-const Section = ({children, title}): Node => {
-  const isDarkMode = useColorScheme() === 'dark';
+  const onPressTimerStart = () => {
+    setTimerStartState(previousTimerState => !previousTimerState);
+    if (!timerStartState) {
+      setCurrentTimerState(0);
+      setTimerLapState([]);
+    }
+  };
+  const onPressTimerLap = () => {
+    setTimerLapState(previousTimerLapState => [
+      ...previousTimerLapState,
+      currentTimerState,
+    ]);
+    setCurrentTimerState(0);
+  };
+
+  useEffect(() => {
+    let timer;
+    timerStartState
+      ? (timer = setInterval(() => {
+          setCurrentTimerState(previousTimerState => {
+            return previousTimerState + 100;
+          });
+        }, 100))
+      : clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+    };
+  }, [timerStartState]);
+
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+    <View style={styles.root}>
+      <View style={styles.timer}>
+        <CircularProgress
+          fill={moment(currentTimerState).format('mm')}
+          text="min"
+        />
+        <CircularProgress
+          fill={moment(currentTimerState).format('ss')}
+          text="sec"
+        />
+        <CircularProgress
+          fill={moment(currentTimerState).milliseconds() / 10}
+          text="msec"
+        />
+      </View>
+      <View style={styles.controlButtons}>
+        <CustomButton
+          onPress={onPressTimerStart}
+          title={timerStartState ? 'Stop' : 'Start'}
+        />
+        <CustomButton
+          onPress={onPressTimerLap}
+          title={'Lap'}
+          disabled={!timerStartState}
+        />
+      </View>
+      <ScrollView
+        style={styles.laps}
+        contentContainerStyle={{
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {timerLapState.map((element, index) => (
+          <LapSelection
+            index={index}
+            lapValue={element}
+            key={element + index}
+          />
+        ))}
+      </ScrollView>
     </View>
   );
 };
 
-const App: () => Node = () => {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.js</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-};
-
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  root: {
+    flex: 1,
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  timer: {
+    flex: 1,
+    backgroundColor: 'black',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    flexDirection: 'row',
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
+  controlButtons: {
+    flex: 0.5,
+    backgroundColor: 'blue',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
   },
-  highlight: {
-    fontWeight: '700',
+  laps: {
+    backgroundColor: 'skyblue',
   },
 });
 
