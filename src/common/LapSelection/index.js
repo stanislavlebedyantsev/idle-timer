@@ -1,6 +1,9 @@
 import React from 'react';
-import {Text, StyleSheet} from 'react-native';
+import {Text} from 'react-native';
 import moment from 'moment';
+
+import { styles } from './styles';
+
 
 const LapSelection = ({index, lapValue}) => {
   return (
@@ -12,10 +15,6 @@ const LapSelection = ({index, lapValue}) => {
   );
 };
 
-const styles = StyleSheet.create({
-  selectorText: {
-    fontSize: 24,
-  },
-});
+
 
 export default LapSelection;

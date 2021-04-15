@@ -2,6 +2,8 @@ import React from 'react';
 import {Text, StyleSheet} from 'react-native';
 import {AnimatedCircularProgress} from 'react-native-circular-progress';
 
+import { styles } from './styles';
+
 const CircularProgress = ({fill, text}) => {
   return (
     <AnimatedCircularProgress
@@ -15,11 +17,6 @@ const CircularProgress = ({fill, text}) => {
   );
 };
 
-const styles = StyleSheet.create({
-  timerText: {
-    color: 'white',
-    fontSize: 36,
-  },
-});
+
 
 export default CircularProgress;
